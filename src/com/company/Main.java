@@ -16,7 +16,7 @@ import javaFlacEncoder.FLACFileWriter;
  */
 public class Main {
 
-    public static void main (String[]args) {
+    public static void main1 (String[]args) {
 
         // Mixer.Info[] infoArray = AudioSystem.getMixerInfo();
         // for(Mixer.Info info : infoArray) {
@@ -71,5 +71,13 @@ public class Main {
         }
 
         file.deleteOnExit ();	//Deletes the file as it is no longer necessary.
+    }
+
+    public static void main (String[] args) {
+        RecordingThread recordingThread = new RecordingThread();
+        recordingThread.addResponceListener(new CommandsRecognizer());
+        recordingThread.addResponceListener(new temp());
+
+        recordingThread.start();
     }
 }
