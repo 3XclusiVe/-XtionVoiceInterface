@@ -1,18 +1,14 @@
 package com.company;
 
-import com.darkprograms.speech.microphone.MicrophoneAnalyzer;
+import com.company.microphone.MicrophoneAnalyzer;
 import com.darkprograms.speech.recognizer.GoogleResponse;
 import com.darkprograms.speech.recognizer.Recognizer;
 import javaFlacEncoder.FLACFileWriter;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Created by user on 20.11.16.
- */
 public class RecordingThread extends Thread {
 
     private String apiKey = "AIzaSyDMRFZsdncfP2udmTbozAQ2owJuL5RRm34";
@@ -21,8 +17,9 @@ public class RecordingThread extends Thread {
 
     private int minimumVolumeToStartrecording = 40;
     private int volumeToStopRecording = 20;
-    private int checkVolumeSampleTime = 10;
-    private int sampleTime = 1000;
+    private int maxSamples = 50;
+    private int checkVolumeSampleTime = 100;
+    private int sampleTime = 100;
 
     private MicrophoneAnalyzer microphone;
     private File tempAudioFile;
@@ -33,8 +30,7 @@ public class RecordingThread extends Thread {
     public RecordingThread() {
 
         microphone = new MicrophoneAnalyzer(FLACFileWriter.FLAC);
-        tempAudioFile = new File("temp.flac");
-        microphone.setAudioFile(tempAudioFile);
+
         recognizer = new Recognizer(Recognizer.Languages.RUSSIAN, apiKey);
         listeners = new ArrayList<ResponseListener>();
 
@@ -47,26 +43,45 @@ public class RecordingThread extends Thread {
     @Override
     public void run() {
 
+        int curSample = 0;
+
         while (true) {
             microphone.open();
 
             try {
+                tempAudioFile = new File("temp.flac");
+                microphone.setAudioFile(tempAudioFile);
                 microphone.captureAudioToFile(microphone.getAudioFile());
+
+                /*double dTms = 32;
+                int bytes = microphone.getNumOfBytes(dTms/1000);
+                int freq = microphone.getFrequency(bytes);
+                int vol = microphone.getAudioVolume((int) dTms);
+                System.out.println(freq + " " + vol);*/
+
                 Thread.sleep(checkVolumeSampleTime * 3);
 
+                double magnitude =  microphone.magnitude(120, 122);
+
                 int volume = microphone.getAudioVolume(checkVolumeSampleTime);
-                boolean isSpeaking = (volume > minimumVolumeToStartrecording);
+                //System.out.println(volume);
+                //boolean isSpeaking = (volume > minimumVolumeToStartrecording);
+                boolean isSpeaking = (magnitude > 100);
 
                 if (isSpeaking) {
 
-                    DebugLog("RECORDING...");
+                    DebugLog("Start RECORDING...");
 
                     do {
+                        DebugLog("RECORDING proc...");
                         Thread.sleep(sampleTime);//Updates every second
-                    } while (microphone.getAudioVolume(sampleTime) > volumeToStopRecording);
+                    } while (microphone.magnitude(120, 122) > 50);
 
 
                     DebugLog("Recording Complete!");
+                    microphone.close();
+                    //Thread.sleep(9000);
+
                     DebugLog("Recognizing...");
 
                     GoogleResponse response = recognizer.getRecognizedDataForFlac(microphone.getAudioFile(), 3);
@@ -74,7 +89,10 @@ public class RecordingThread extends Thread {
 
                     DebugLog("Looping back");//Restarts loops
 
+
                 }
+                microphone.getAudioFile().delete();
+
 
             } catch (Exception e) {
                 // TODO Auto-generated catch block

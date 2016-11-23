@@ -9,11 +9,7 @@ import com.darkprograms.speech.recognizer.Recognizer;
 import com.darkprograms.speech.recognizer.GoogleResponse;
 import javaFlacEncoder.FLACFileWriter;
 
-/**
- * Jarvis Speech API Tutorial
- * @author Aaron Gokaslan (Skylion)
- *
- */
+
 public class Main {
 
     public static void main1 (String[]args) {
@@ -32,12 +28,12 @@ public class Main {
         try {
             mic.captureAudioToFile (file);
         } catch (Exception ex) {
-            //Microphone not available or some other error.
-            System.out.println ("ERROR: Microphone is not availible.");
+            //com.company.microphone.Microphone not available or some other error.
+            System.out.println ("ERROR: com.company.microphone.Microphone is not availible.");
             ex.printStackTrace ();
         }
 
-    /* User records the voice here. Microphone starts a separate thread so do whatever you want
+    /* User records the voice here. com.company.microphone.Microphone starts a separate thread so do whatever you want
      * in the mean time. Show a recording icon or whatever.
      */
         try {
@@ -75,8 +71,12 @@ public class Main {
 
     public static void main (String[] args) {
         RecordingThread recordingThread = new RecordingThread();
-        recordingThread.addResponceListener(new CommandsRecognizer());
+        CommandsRecognizer commandsRecognizer = new CommandsRecognizer();
+
         recordingThread.addResponceListener(new temp());
+        recordingThread.addResponceListener(commandsRecognizer);
+
+        commandsRecognizer.addListener(new test());
 
         recordingThread.start();
     }

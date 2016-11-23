@@ -3,6 +3,8 @@ package com.company;
 import com.darkprograms.speech.recognizer.GoogleResponse;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 
+import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 
 /**
@@ -10,7 +12,21 @@ import java.util.List;
  */
 public class CommandsRecognizer implements ResponseListener {
 
-    JaroWinkler jaroWinkler;
+    private enum  Commands {
+        startTraining,
+        poseType,
+        capturePose,
+        completeTraining
+    }
+
+    private List<CommandsListener> listeners;
+
+    private EnumMap<Commands, String> commands;
+    private EnumMap<Commands, Double> commandsSimilarity;
+
+    private JaroWinkler jaroWinkler;
+
+    private int commandsCount = 4;
 
     private static final String startTraining = "начать обучение";
     private static final String poseType = "название новой позы";
@@ -18,8 +34,22 @@ public class CommandsRecognizer implements ResponseListener {
     private static final String completeTraining = "закончить обучение";
 
 
+
     public CommandsRecognizer() {
         jaroWinkler = new JaroWinkler();
+        commands = new EnumMap<Commands, String>(Commands.class);
+        commandsSimilarity = new EnumMap<Commands, Double>(Commands.class);
+
+        commands.put(Commands.startTraining, startTraining);
+        commands.put(Commands.capturePose, capturePose);
+        commands.put(Commands.poseType, poseType);
+        commands.put(Commands.completeTraining, completeTraining);
+
+        listeners = new ArrayList<CommandsListener>();
+    }
+
+    public void addListener(CommandsListener listener) {
+        listeners.add(listener);
     }
 
 
@@ -54,9 +84,51 @@ public class CommandsRecognizer implements ResponseListener {
             }
         }
 
-        System.out.println(startTrainingSimilarity);
-        System.out.println(poseTypeSimilarity);
-        System.out.println(capturePoseSimilarity);
-        System.out.println(completeTrainingSimilarity);
+        commandsSimilarity.put(Commands.startTraining, startTrainingSimilarity);
+        commandsSimilarity.put(Commands.poseType, poseTypeSimilarity);
+        commandsSimilarity.put(Commands.capturePose, capturePoseSimilarity);
+        commandsSimilarity.put(Commands.completeTraining, completeTrainingSimilarity);
+
+        RecognizedCommand recognizedCommand = new RecognizedCommand();
+
+        for (Commands command : Commands.values()) {
+            if(recognizedCommand.Similarity < commandsSimilarity.get(command)) {
+                recognizedCommand.command = command;
+                recognizedCommand.Similarity = commandsSimilarity.get(command);
+
+            }
+            System.out.println(command + " " + commandsSimilarity.get(command));
+        }
+
+        double tresHold = 0.7;
+
+        if(recognizedCommand.Similarity > tresHold) {
+            for (CommandsListener listener : listeners) {
+                sendCommand(listener, recognizedCommand.command);
+            }
+        }
+    }
+
+    private void sendCommand(CommandsListener listener, Commands command) {
+        switch (command) {
+            case startTraining:
+                listener.onStartTraining();
+                break;
+            case poseType:
+                listener.onPoseType("New name");
+                break;
+            case capturePose:
+                listener.onCapturePose();
+                break;
+            case completeTraining:
+                listener.onCompleteTraining();
+                break;
+        }
+    }
+
+
+    class RecognizedCommand {
+        public Commands command = null;
+        public double Similarity = 0;
     }
 }
