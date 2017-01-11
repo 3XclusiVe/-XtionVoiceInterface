@@ -1,4 +1,4 @@
-package com.company;
+package com.company.RecordingThread;
 
 import com.company.microphone.MicrophoneAnalyzer;
 import com.darkprograms.speech.recognizer.GoogleResponse;
@@ -49,7 +49,7 @@ public class RecordingThread extends Thread {
             microphone.open();
 
             try {
-                tempAudioFile = new File("temp.flac");
+                tempAudioFile = new File("DisplayAllReponce.flac");
                 microphone.setAudioFile(tempAudioFile);
                 microphone.captureAudioToFile(microphone.getAudioFile());
 

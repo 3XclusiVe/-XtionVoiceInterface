@@ -1,9 +1,11 @@
 package com.company;
 
+import com.company.CommandsRecognizers.CommandsListener;
+
 /**
  * Created by user on 21.11.16.
  */
-public class test implements CommandsListener {
+public class testInterfaceCommandsListener implements CommandsListener {
     @Override
     public void onStartTraining() {
         System.out.println("**************");

@@ -1,4 +1,4 @@
-package com.company;
+package com.company.RecordingThread;
 
 import com.darkprograms.speech.recognizer.GoogleResponse;
 

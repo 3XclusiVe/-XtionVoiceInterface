@@ -1,4 +1,4 @@
-package com.company;
+package com.company.CommandsRecognizers;
 
 /**
  * Created by user on 21.11.16.

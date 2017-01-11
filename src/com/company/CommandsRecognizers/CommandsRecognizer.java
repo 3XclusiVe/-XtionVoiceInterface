@@ -1,5 +1,6 @@
-package com.company;
+package com.company.CommandsRecognizers;
 
+import com.company.RecordingThread.ResponseListener;
 import com.darkprograms.speech.recognizer.GoogleResponse;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 
@@ -25,8 +26,6 @@ public class CommandsRecognizer implements ResponseListener {
     private EnumMap<Commands, Double> commandsSimilarity;
 
     private JaroWinkler jaroWinkler;
-
-    private int commandsCount = 4;
 
     private static final String startTraining = "начать обучение";
     private static final String poseType = "название новой позы";
