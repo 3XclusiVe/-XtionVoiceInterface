@@ -5,11 +5,15 @@ import com.darkprograms.speech.recognizer.GoogleResponse;
 import com.darkprograms.speech.recognizer.Recognizer;
 import javaFlacEncoder.FLACFileWriter;
 
+import javax.sound.sampled.LineUnavailableException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class RecordingThread extends Thread {
+
+    private double Silence = 0.6;
+    private double CurrentNoiseLevel;
 
     private String apiKey = "AIzaSyDMRFZsdncfP2udmTbozAQ2owJuL5RRm34";
 
@@ -34,6 +38,48 @@ public class RecordingThread extends Thread {
         recognizer = new Recognizer(Recognizer.Languages.RUSSIAN, apiKey);
         listeners = new ArrayList<ResponseListener>();
 
+        int TimeInMsToCalculateNoiseLevel = 1000;
+        System.out.println("Start Calculating Noise Level");
+        CurrentNoiseLevel =  CalculateNoiseLevel(TimeInMsToCalculateNoiseLevel);
+        System.out.println("Noise Level = " + CurrentNoiseLevel);
+
+    }
+
+    private double CalculateNoiseLevel(int TimeInMsToCalculateNoiseLevel) {
+
+        tempAudioFile = new File("DisplayAllReponce.flac");
+        microphone.setAudioFile(tempAudioFile);
+        try {
+            microphone.captureAudioToFile(microphone.getAudioFile());
+        } catch (LineUnavailableException e) {
+            e.printStackTrace();
+        }
+
+        int SampleTime = 100;
+        int SampleCount = 0;
+        double NoiseLevel = 0;
+        int CurrentTimeInMs = 0;
+
+        while (CurrentTimeInMs <= TimeInMsToCalculateNoiseLevel) {
+
+            double magnitude =  microphone.magnitude(120, 122);
+            try {
+                Thread.currentThread().sleep(SampleTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            SampleCount++;
+            NoiseLevel += magnitude;
+            CurrentTimeInMs += SampleTime;
+
+        }
+
+        NoiseLevel = NoiseLevel / SampleCount;
+
+        microphone.getAudioFile().delete();
+
+
+        return NoiseLevel;
     }
 
     public void addResponceListener(ResponseListener listener) {
@@ -64,9 +110,9 @@ public class RecordingThread extends Thread {
                 double magnitude =  microphone.magnitude(120, 122);
 
                 int volume = microphone.getAudioVolume(checkVolumeSampleTime);
-                //System.out.println(volume);
+                System.out.println(magnitude);
                 //boolean isSpeaking = (volume > minimumVolumeToStartrecording);
-                boolean isSpeaking = (magnitude > 100);
+                boolean isSpeaking = (magnitude > 200);
 
                 if (isSpeaking) {
 
@@ -75,7 +121,7 @@ public class RecordingThread extends Thread {
                     do {
                         DebugLog("RECORDING proc...");
                         Thread.sleep(sampleTime);//Updates every second
-                    } while (microphone.magnitude(120, 122) > 50);
+                    } while (microphone.magnitude(120, 122) > 100);
 
 
                     DebugLog("Recording Complete!");

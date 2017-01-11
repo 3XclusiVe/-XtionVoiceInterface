@@ -29,7 +29,7 @@ public class CommandsRecognizer implements ResponseListener {
 
     private static final String startTraining = "начать обучение";
     private static final String poseType = "название новой позы";
-    private static final String capturePose = "фиксация";
+    private static final String capturePose = "фиксация fixation";
     private static final String completeTraining = "закончить обучение";
 
 
