@@ -8,6 +8,8 @@ import javaFlacEncoder.FLACFileWriter;
 import javax.sound.sampled.LineUnavailableException;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class RecordingThread extends Thread {
@@ -59,6 +61,7 @@ public class RecordingThread extends Thread {
         int SampleCount = 0;
         double NoiseLevel = 0;
         int CurrentTimeInMs = 0;
+        List<Double> NoiseArray = new ArrayList<Double>();
 
         while (CurrentTimeInMs <= TimeInMsToCalculateNoiseLevel) {
 
@@ -69,12 +72,13 @@ public class RecordingThread extends Thread {
                 e.printStackTrace();
             }
             SampleCount++;
-            NoiseLevel += magnitude;
+            NoiseArray.add(magnitude);
             CurrentTimeInMs += SampleTime;
 
         }
+        NoiseLevel = this.calculateAverage(NoiseArray);
 
-        NoiseLevel = NoiseLevel / SampleCount;
+        NoiseLevel = Collections.max(NoiseArray);
 
         microphone.getAudioFile().delete();
 
@@ -164,6 +168,17 @@ public class RecordingThread extends Thread {
         if (debug) {
             System.out.println(message);
         }
+    }
+
+    private double calculateAverage(List <Double> marks) {
+        Double sum = Double.valueOf(0);
+        if(!marks.isEmpty()) {
+            for (Double mark : marks) {
+                sum += mark;
+            }
+            return sum.doubleValue() / marks.size();
+        }
+        return sum;
     }
 
 }
