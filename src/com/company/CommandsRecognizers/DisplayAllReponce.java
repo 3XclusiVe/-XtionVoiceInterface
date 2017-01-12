@@ -7,7 +7,6 @@ import com.darkprograms.speech.recognizer.GoogleResponse;
  * Created by user on 21.11.16.
  */
 public class DisplayAllReponce implements ResponseListener {
-    @Override
     public void onResponce(GoogleResponse response) {
 
         displayResponse(response);

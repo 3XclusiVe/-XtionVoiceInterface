@@ -52,7 +52,6 @@ public class CommandsRecognizer implements ResponseListener {
     }
 
 
-    @Override
     public void onResponce(GoogleResponse response) {
         List<String> responces =  response.getOtherPossibleResponses();
 

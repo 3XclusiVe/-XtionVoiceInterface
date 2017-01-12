@@ -116,7 +116,7 @@ public class RecordingThread extends Thread {
                 int volume = microphone.getAudioVolume(checkVolumeSampleTime);
                 System.out.println(magnitude);
                 //boolean isSpeaking = (volume > minimumVolumeToStartrecording);
-                boolean isSpeaking = (magnitude > 300);
+                boolean isSpeaking = (magnitude > 200);
 
                 if (isSpeaking) {
 
@@ -130,11 +130,11 @@ public class RecordingThread extends Thread {
 
                     DebugLog("Recording Complete!");
                     microphone.close();
-                    //Thread.sleep(9000);
+                    Thread.sleep(9000);
 
                     DebugLog("Recognizing...");
 
-                    GoogleResponse response = recognizer.getRecognizedDataForFlac(microphone.getAudioFile(), 3);
+                    GoogleResponse response = recognizer.getRecognizedDataForFlac(microphone.getAudioFile(), 1);
                     notifyListeners(response);
 
                     DebugLog("Looping back");//Restarts loops
