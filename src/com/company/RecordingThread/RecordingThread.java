@@ -112,7 +112,7 @@ public class RecordingThread extends Thread {
                 int volume = microphone.getAudioVolume(checkVolumeSampleTime);
                 System.out.println(magnitude);
                 //boolean isSpeaking = (volume > minimumVolumeToStartrecording);
-                boolean isSpeaking = (magnitude > 200);
+                boolean isSpeaking = (magnitude > 300);
 
                 if (isSpeaking) {
 
