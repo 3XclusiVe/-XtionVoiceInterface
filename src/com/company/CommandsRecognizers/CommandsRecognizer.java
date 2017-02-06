@@ -104,7 +104,15 @@ public class CommandsRecognizer implements ResponseListener {
             for (CommandsListener listener : listeners) {
                 sendCommand(listener, recognizedCommand.command);
             }
+        } else {
+            for (CommandsListener listener : listeners) {
+                sendNoCommand(listener);
+            }
         }
+    }
+
+    private void sendNoCommand(CommandsListener listener) {
+        listener.noCommand();
     }
 
     private void sendCommand(CommandsListener listener, Commands command) {

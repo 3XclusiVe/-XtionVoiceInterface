@@ -8,4 +8,5 @@ public interface CommandsListener {
     void onPoseType(String name);
     void onCapturePose();
     void onCompleteTraining();
+    void noCommand();
 }

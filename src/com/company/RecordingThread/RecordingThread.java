@@ -130,7 +130,6 @@ public class RecordingThread extends Thread {
 
                     DebugLog("Recording Complete!");
                     microphone.close();
-                    Thread.sleep(9000);
 
                     DebugLog("Recognizing...");
 

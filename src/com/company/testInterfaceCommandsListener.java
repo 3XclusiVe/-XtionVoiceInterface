@@ -29,4 +29,11 @@ public class testInterfaceCommandsListener implements CommandsListener {
         System.out.println("End Training");
         System.out.println("**************");
     }
+
+    @Override
+    public void noCommand() {
+        System.out.println("**************");
+        System.out.println("No Command");
+        System.out.println("**************");
+    }
 }
