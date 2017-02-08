@@ -155,7 +155,7 @@ public class MicrophoneAnalyzer extends Microphone {
 
     public double magnitude (int minFreq, int maxFreq) {
 
-        int numOfBytes = 4096;
+        int numOfBytes = 2048;
 
         if(getTargetDataLine() == null){
             return -1;

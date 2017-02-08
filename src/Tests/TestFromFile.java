@@ -29,7 +29,7 @@ public class TestFromFile {
 
 
         Microphone mic = new Microphone(FLACFileWriter.FLAC);
-        File file = new File ("/Users/user/Desktop/22/DisplayAllReponce.flac");	//Name your file whatever you want
+        File file = new File ("/Users/user/Desktop/1/1.flac");	//Name your file whatever you want
 
 
         Recognizer recognizer = new Recognizer (Recognizer.Languages.RUSSIAN, "AIzaSyDMRFZsdncfP2udmTbozAQ2owJuL5RRm34");

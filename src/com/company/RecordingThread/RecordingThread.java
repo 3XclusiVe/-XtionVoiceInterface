@@ -40,7 +40,7 @@ public class RecordingThread extends Thread {
         recognizer = new Recognizer(Recognizer.Languages.RUSSIAN, apiKey);
         listeners = new ArrayList<ResponseListener>();
 
-        int TimeInMsToCalculateNoiseLevel = 1000;
+        int TimeInMsToCalculateNoiseLevel = 10;
         System.out.println("Start Calculating Noise Level");
         CurrentNoiseLevel =  CalculateNoiseLevel(TimeInMsToCalculateNoiseLevel);
         System.out.println("Noise Level = " + CurrentNoiseLevel);
@@ -113,7 +113,7 @@ public class RecordingThread extends Thread {
 
                 double magnitude =  microphone.magnitude(120, 122);
 
-                int volume = microphone.getAudioVolume(checkVolumeSampleTime);
+                //int magnitude = microphone.getAudioVolume(checkVolumeSampleTime);
                 System.out.println(magnitude);
                 //boolean isSpeaking = (volume > minimumVolumeToStartrecording);
                 boolean isSpeaking = (magnitude > 200);
