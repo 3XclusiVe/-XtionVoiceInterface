@@ -3,7 +3,10 @@ package com.company.microphone;
 import com.darkprograms.speech.util.Complex;
 import com.darkprograms.speech.util.FFT;
 
+import java.io.IOException;
+
 import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioInputStream;
 
 
 /********************************************************************************************
@@ -156,12 +159,16 @@ public class MicrophoneAnalyzer extends Microphone {
     public double magnitude (int minFreq, int maxFreq) {
 
         int numOfBytes = 2048;
+        
+        AudioInputStream stream = new AudioInputStream(getTargetDataLine());
 
-        if(getTargetDataLine() == null){
-            return -1;
-        }
         byte[] data = new byte[numOfBytes+1];//One byte is lost during conversion
-        this.getTargetDataLine().read(data, 0, numOfBytes);
+        try {
+			stream.read(data, 0, numOfBytes);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 
         double[] audioData = this.bytesToDoubleArray(data);

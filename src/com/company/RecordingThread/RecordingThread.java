@@ -103,12 +103,6 @@ public class RecordingThread extends Thread {
                 microphone.setAudioFile(tempAudioFile);
                 microphone.captureAudioToFile(microphone.getAudioFile());
 
-                /*double dTms = 32;
-                int bytes = microphone.getNumOfBytes(dTms/1000);
-                int freq = microphone.getFrequency(bytes);
-                int vol = microphone.getAudioVolume((int) dTms);
-                System.out.println(freq + " " + vol);*/
-
                 Thread.sleep(checkVolumeSampleTime * 3);
 
                 double magnitude =  microphone.magnitude(120, 122);

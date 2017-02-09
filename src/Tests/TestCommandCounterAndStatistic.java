@@ -11,28 +11,28 @@ public class TestCommandCounterAndStatistic implements CommandsListener {
     private int correctCommandCounter = 0;
     private int commandCounter = 0;
 
-    @Override
+    
     public void onStartTraining() {
         correctCommandCounter += 1;
         commandCounter+=1;
     }
 
-    @Override
+    
     public void onPoseType(String name) {
         commandCounter+=1;
     }
 
-    @Override
+    
     public void onCapturePose() {
         commandCounter+=1;
     }
 
-    @Override
+    
     public void onCompleteTraining() {
         commandCounter+=1;
     }
 
-    @Override
+    
     public void noCommand() {
         commandCounter+=1;
     }
