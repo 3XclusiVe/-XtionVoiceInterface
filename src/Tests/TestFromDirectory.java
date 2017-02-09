@@ -16,7 +16,7 @@ import java.io.IOException;
  */
 public class TestFromDirectory {
 
-    public static String pathToDirectoryWithAudio = "/Users/user/Desktop/no_Converted/Converted";
+    public static String pathToDirectoryWithAudio = "all_records/Converted";
 
     public static CommandsRecognizer commandsRecognizer = new CommandsRecognizer();
 
