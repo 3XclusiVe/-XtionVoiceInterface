@@ -12,6 +12,8 @@ import java.io.IOException;
 public class Main {
 
     public static void main (String[] args) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
+        //RecordingThread recordingThread = new RecordingThread();
+        //File AudioStream = new File("/Users/user/IdeaProjects/test_google_speach_api/all_records/Converted/4.wav");
         RecordingThread recordingThread = new RecordingThread();
         CommandsRecognizer commandsRecognizer = new CommandsRecognizer();
 

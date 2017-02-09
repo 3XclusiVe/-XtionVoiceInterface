@@ -2,11 +2,14 @@ package com.company.microphone;
 
 import com.darkprograms.speech.util.Complex;
 import com.darkprograms.speech.util.FFT;
+import org.kc7bfi.jflac.sound.spi.FlacAudioFileReader;
 
 import java.io.IOException;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 
 /********************************************************************************************
@@ -169,6 +172,62 @@ public class MicrophoneAnalyzer extends Microphone {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+
+        double[] audioData = this.bytesToDoubleArray(data);
+        audioData = applyHanningWindow(audioData);
+        Complex[] complex = new Complex[audioData.length];
+        for(int i = 0; i<complex.length; i++){
+            complex[i] = new Complex(audioData[i], 0);
+        }
+        Complex[] fftData = FFT.fft(complex);
+
+
+        int N = 3;
+
+        if(N<=0 || fftData == null){ return -1; } //error case
+
+        final int LENGTH = fftData.length;//Used to calculate bin size
+        fftData = removeNegativeFrequencies(fftData);
+
+        Complex[][] comdata = new Complex[N][fftData.length/N];
+        for(int i = 0; i<N; i++){
+            for(int j = 0; j<comdata[0].length; j++){
+                comdata[i][j] = fftData[j*(i+1)];
+            }
+        }
+
+        Complex[] result = new Complex[fftData.length/N];//Combines the arrays
+        for(int i = 0; i<result.length; i++){
+            Complex tmp = new Complex(1,0);
+            for(int j = 0; j<N; j++){
+                tmp = tmp.times(comdata[j][i]);
+            }
+            result[i] = tmp;
+        }
+
+
+        return findMeanBetween(minFreq, maxFreq, fftData);
+
+    }
+
+    static int numOfBytesTotalOffset = 0;
+
+    public double magnitudeInFile (int minFreq, int maxFreq) throws IOException, UnsupportedAudioFileException {
+
+        int numOfBytes = 2048;
+
+        numOfBytesTotalOffset += numOfBytes;
+        FlacAudioFileReader flacAudioFileReader = new FlacAudioFileReader();
+        AudioInputStream stream  = flacAudioFileReader.getAudioInputStream(this.getAudioFile());
+
+        byte[] data = new byte[numOfBytes+1];//One byte is lost during conversion
+        try {
+            stream.read(data, 0, numOfBytes);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
 
         double[] audioData = this.bytesToDoubleArray(data);

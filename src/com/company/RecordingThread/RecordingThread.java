@@ -33,6 +33,8 @@ public class RecordingThread extends Thread {
 
     private List<ResponseListener> listeners;
 
+    private File AudioFileStream;
+
     public RecordingThread() {
 
         microphone = new MicrophoneAnalyzer(FLACFileWriter.FLAC);
@@ -44,6 +46,17 @@ public class RecordingThread extends Thread {
         System.out.println("Start Calculating Noise Level");
         CurrentNoiseLevel =  CalculateNoiseLevel(TimeInMsToCalculateNoiseLevel);
         System.out.println("Noise Level = " + CurrentNoiseLevel);
+
+    }
+
+    public RecordingThread(File AudioFile) {
+
+        microphone = new MicrophoneAnalyzer(FLACFileWriter.FLAC);
+
+        recognizer = new Recognizer(Recognizer.Languages.RUSSIAN, apiKey);
+        listeners = new ArrayList<ResponseListener>();
+
+        this.AudioFileStream = AudioFile;
 
     }
 
@@ -94,56 +107,111 @@ public class RecordingThread extends Thread {
     public void run() {
 
         int curSample = 0;
+        if(this.AudioFileStream == null) {
 
-        while (true) {
-            microphone.open();
+            while (true) {
+                microphone.open();
 
-            try {
-                tempAudioFile = new File("DisplayAllReponce.flac");
-                microphone.setAudioFile(tempAudioFile);
-                microphone.captureAudioToFile(microphone.getAudioFile());
-
-                Thread.sleep(checkVolumeSampleTime * 3);
-
-                double magnitude =  microphone.magnitude(120, 122);
-
-                //int magnitude = microphone.getAudioVolume(checkVolumeSampleTime);
-                System.out.println(magnitude);
-                //boolean isSpeaking = (volume > minimumVolumeToStartrecording);
-                boolean isSpeaking = (magnitude > 200);
-
-                if (isSpeaking) {
-
-                    DebugLog("Start RECORDING...");
-
-                    do {
-                        DebugLog("RECORDING proc...");
-                        Thread.sleep(sampleTime);//Updates every second
-                    } while (microphone.magnitude(120, 122) > 100);
+                try {
+                    tempAudioFile = new File("DisplayAllReponce.flac");
+                    microphone.setAudioFile(tempAudioFile);
+                    microphone.captureAudioToFile(microphone.getAudioFile());
 
 
-                    DebugLog("Recording Complete!");
-                    microphone.close();
+                    Thread.sleep(checkVolumeSampleTime * 3);
 
-                    DebugLog("Recognizing...");
+                    double magnitude = microphone.magnitude(120, 122);
 
-                    GoogleResponse response = recognizer.getRecognizedDataForFlac(microphone.getAudioFile(), 1);
-                    notifyListeners(response);
+                    //int magnitude = microphone.getAudioVolume(checkVolumeSampleTime);
+                    System.out.println(magnitude);
+                    //boolean isSpeaking = (volume > minimumVolumeToStartrecording);
+                    boolean isSpeaking = (magnitude > 200);
 
-                    DebugLog("Looping back");//Restarts loops
+                    if (isSpeaking) {
+
+                        DebugLog("Start RECORDING...");
+
+                        do {
+                            DebugLog("RECORDING proc...");
+                            Thread.sleep(sampleTime);//Updates every second
+                        } while (microphone.magnitude(120, 122) > 100);
 
 
+                        DebugLog("Recording Complete!");
+                        microphone.close();
+
+                        DebugLog("Recognizing...");
+
+                        GoogleResponse response = recognizer.getRecognizedDataForFlac(microphone.getAudioFile(), 1);
+                        notifyListeners(response);
+
+                        DebugLog("Looping back");//Restarts loops
+
+
+                    }
+                    microphone.getAudioFile().delete();
+
+
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    System.out.println("Error Occured");
+                } finally {
+                    microphone.close();//Makes sure microphone closes on exit.
                 }
-                microphone.getAudioFile().delete();
-
-
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                System.out.println("Error Occured");
-            } finally {
-                microphone.close();//Makes sure microphone closes on exit.
             }
+        } else {
+
+            while (true) {
+                microphone.open();
+
+                try {
+                    tempAudioFile = new File("DisplayAllReponce.flac");
+                    microphone.setAudioFile(tempAudioFile);
+                    microphone.captureAudioFromFileToFile(microphone.getAudioFile(), AudioFileStream);
+
+                    Thread.sleep(checkVolumeSampleTime * 3);
+
+                    double magnitude = microphone.magnitudeInFile(120, 122);
+
+                    //int magnitude = microphone.getAudioVolume(checkVolumeSampleTime);
+                    System.out.println(magnitude);
+                    //boolean isSpeaking = (volume > minimumVolumeToStartrecording);
+                    boolean isSpeaking = (magnitude > 200);
+
+                    if (isSpeaking) {
+
+                        DebugLog("Start RECORDING...");
+
+                        do {
+                            DebugLog("RECORDING proc...");
+                            Thread.sleep(sampleTime);//Updates every second
+                        } while (microphone.magnitude(120, 122) > 100);
+
+                        DebugLog("Recording Complete!");
+                        microphone.close();
+
+                        DebugLog("Recognizing...");
+
+                        GoogleResponse response = recognizer.getRecognizedDataForFlac(microphone.getAudioFile(), 1);
+                        notifyListeners(response);
+
+                        DebugLog("Looping back");//Restarts loops
+
+
+                    }
+                    microphone.getAudioFile().delete();
+
+
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    System.out.println("Error Occured");
+                } finally {
+                    microphone.close();//Makes sure microphone closes on exit.
+                }
+            }
+
         }
 
     }

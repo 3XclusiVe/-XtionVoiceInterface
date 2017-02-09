@@ -1,5 +1,7 @@
 package com.company.microphone;
 
+import org.kc7bfi.jflac.sound.spi.FlacAudioFileReader;
+
 import javax.sound.sampled.*;
 
 import java.io.Closeable;
@@ -134,6 +136,29 @@ public class Microphone implements Closeable{
 
     }
 
+    protected File audioFileStream;
+    /**
+     * Captures audio from the microphone and saves it a file
+     *
+     * @param audioFile The File to save the audio to
+     * @throws LineUnavailableException
+     */
+    public void captureAudioFromFileToFile(File audioFile, File audioFileStream) throws LineUnavailableException {
+
+        setState(CaptureState.STARTING_CAPTURE);
+        setAudioFile(audioFile);
+        this.audioFileStream = audioFileStream;
+
+        if(getTargetDataLine() == null){
+            initTargetDataLine();
+        }
+
+        //Get Audio
+        new Thread(new CaptureFromFileThread()).start();
+
+
+    }
+
     /**
      * Captures audio from the microphone and saves it a file
      *
@@ -209,11 +234,37 @@ public class Microphone implements Closeable{
          * Run method for thread
          */
         public void run() {
+
             try {
                 AudioFileFormat.Type fileType = getFileType();
                 File audioFile = getAudioFile();
                 open();
                 AudioSystem.write(new AudioInputStream(getTargetDataLine()), fileType, audioFile);
+                //Will write to File until it's closed.
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Thread to capture the audio from the microphone and save it to a file
+     */
+    private class CaptureFromFileThread implements Runnable {
+
+        /**
+         * Run method for thread
+         */
+        public void run() {
+
+            try {
+                AudioFileFormat.Type fileType = getFileType();
+                File audioFile = getAudioFile();
+                File audioStream = audioFileStream;
+                open();
+
+                AudioInputStream inputStream  = AudioSystem.getAudioInputStream(audioFileStream);
+                AudioSystem.write(inputStream, fileType, audioFile);
                 //Will write to File until it's closed.
             } catch (Exception ex) {
                 ex.printStackTrace();
