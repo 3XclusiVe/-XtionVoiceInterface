@@ -182,7 +182,6 @@ public class MicrophoneAnalyzer extends Microphone {
         }
         Complex[] fftData = FFT.fft(complex);
 
-
         int N = 3;
 
         if(N<=0 || fftData == null){ return -1; } //error case

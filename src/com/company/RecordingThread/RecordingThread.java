@@ -8,7 +8,6 @@ import javaFlacEncoder.FLACFileWriter;
 import javax.sound.sampled.LineUnavailableException;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -112,15 +111,16 @@ public class RecordingThread extends Thread {
             while (true) {
                 microphone.open();
 
+
                 try {
                     tempAudioFile = new File("DisplayAllReponce.flac");
                     microphone.setAudioFile(tempAudioFile);
                     microphone.captureAudioToFile(microphone.getAudioFile());
 
 
-                    Thread.sleep(checkVolumeSampleTime * 3);
+                    Thread.sleep(checkVolumeSampleTime * 2);
 
-                    double magnitude = microphone.magnitude(120, 122);
+                    double magnitude = microphone.magnitude(100, 102);
 
                     //int magnitude = microphone.getAudioVolume(checkVolumeSampleTime);
                     System.out.println(magnitude);
@@ -131,10 +131,21 @@ public class RecordingThread extends Thread {
 
                         DebugLog("Start RECORDING...");
 
-                        do {
+                        int  counter = 0;
+                        for(;;) {
+
                             DebugLog("RECORDING proc...");
-                            Thread.sleep(sampleTime);//Updates every second
-                        } while (microphone.magnitude(120, 122) > 100);
+                            Thread.sleep(sampleTime / 2);//Updates every second
+                            if(microphone.magnitude(100, 102) < 400) {
+                                counter++;
+                            } else {
+                                counter = 0;
+                            }
+                            if(counter >= 2) {
+                                break;
+                            }
+                        }
+                        //while (microphone.magnitude(120, 122) > 100);
 
 
                         DebugLog("Recording Complete!");
@@ -157,6 +168,7 @@ public class RecordingThread extends Thread {
                     e.printStackTrace();
                     System.out.println("Error Occured");
                 } finally {
+
                     microphone.close();//Makes sure microphone closes on exit.
                 }
             }
