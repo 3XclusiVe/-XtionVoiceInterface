@@ -1,5 +1,6 @@
 package com.company.RecordingThread;
 
+import com.company.Main;
 import com.company.microphone.MicrophoneAnalyzer;
 import com.darkprograms.speech.recognizer.GoogleResponse;
 import com.darkprograms.speech.recognizer.Recognizer;
@@ -118,14 +119,14 @@ public class RecordingThread extends Thread {
                     microphone.captureAudioToFile(microphone.getAudioFile());
 
 
-                    Thread.sleep(checkVolumeSampleTime * 2);
+                    Thread.sleep(checkVolumeSampleTime * 4);
 
                     double magnitude = microphone.magnitude(100, 102);
 
                     //int magnitude = microphone.getAudioVolume(checkVolumeSampleTime);
                     System.out.println(magnitude);
                     //boolean isSpeaking = (volume > minimumVolumeToStartrecording);
-                    boolean isSpeaking = (magnitude > 200);
+                    boolean isSpeaking = (magnitude > 100);
 
                     if (isSpeaking) {
 
@@ -150,7 +151,7 @@ public class RecordingThread extends Thread {
 
                         DebugLog("Recording Complete!");
                         microphone.close();
-
+                        Thread.sleep(1000000);
                         DebugLog("Recognizing...");
 
                         GoogleResponse response = recognizer.getRecognizedDataForFlac(microphone.getAudioFile(), 1);
@@ -161,6 +162,10 @@ public class RecordingThread extends Thread {
 
                     }
                     microphone.getAudioFile().delete();
+
+                    if(magnitude == 0) {
+                        Main.testCommandCounterAndStatistic.printStats();
+                    }
 
 
                 } catch (Exception e) {

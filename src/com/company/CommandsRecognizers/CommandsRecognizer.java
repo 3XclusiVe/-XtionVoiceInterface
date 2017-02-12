@@ -28,9 +28,10 @@ public class CommandsRecognizer implements ResponseListener {
     private JaroWinkler jaroWinkler;
 
     private static final String startTraining = "начать обучение";
-    private static final String poseType = "название новой позы";
-    private static final String capturePose = "фиксация fixation";
-    private static final String completeTraining = "закончить обучение";
+    private static final String startTraining2 = "обучение";
+    private static final String poseType = "новая поза ";
+    private static final String capturePose = "фиксация";
+    private static final String completeTraining = "завершить";
 
 
 
@@ -68,6 +69,10 @@ public class CommandsRecognizer implements ResponseListener {
                     startTrainingSimilarity = jaroWinkler.similarity(responce, startTraining);
                 }
 
+                if(startTrainingSimilarity < jaroWinkler.similarity(responce, startTraining2)) {
+                    startTrainingSimilarity = jaroWinkler.similarity(responce, startTraining2);
+                }
+
                 if(poseTypeSimilarity < jaroWinkler.similarity(responce, poseType)) {
                     poseTypeSimilarity = jaroWinkler.similarity(responce, poseType);
                 }
@@ -98,7 +103,7 @@ public class CommandsRecognizer implements ResponseListener {
             System.out.println(command + " " + commandsSimilarity.get(command));
         }
 
-        double tresHold = 0.7;
+        double tresHold = 0.4;
 
         if(recognizedCommand.Similarity > tresHold) {
             for (CommandsListener listener : listeners) {
